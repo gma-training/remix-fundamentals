@@ -1,5 +1,5 @@
 import { prisma } from "~/db.server";
 
-export async function getPosts() {
-  return await prisma.post.findMany();
+export async function getPostListItems() {
+  return await prisma.post.findMany({ select: { slug: true, title: true } });
 }
