@@ -5,7 +5,9 @@ import { useLoaderData } from "@remix-run/react";
 import { getPost } from "~/models/post.server";
 
 export async function loader({ params }: LoaderArgs) {
-  const post = await getPost(params.slug);
+  const { slug } = params;
+  if (!slug) throw new Error("Slug not defined");
+  const post = await getPost(slug);
   return json({ post });
 }
 
