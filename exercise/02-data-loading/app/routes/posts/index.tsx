@@ -4,7 +4,7 @@ import { getPosts } from "~/models/post.server";
 
 export const loader = async () => {
   const posts = await getPosts();
-  return json({ posts });
+  return json({ posts: posts.map((p) => ({ slug: p.slug, title: p.title })) });
 };
 
 export default function Posts() {
