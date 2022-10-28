@@ -6,8 +6,8 @@
 // 5. redirect to "/posts/admin".
 
 import type { ActionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import { createPost } from "~/models/post.server";
 
 const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
@@ -17,25 +17,41 @@ export async function action({ request, params }: ActionArgs) {
 
   const slug = form.get("slug");
   const title = form.get("title");
+  if (typeof title !== "string" || !title) {
+    return json({ title: "Title is required" });
+  }
+  if (typeof slug !== "string" || !slug) {
+    return json({ slug: "Slug is required" });
+  }
   const markdown = form.get("markdown");
+  if (typeof markdown !== "string" || !markdown) {
+    return json({ markdown: "Markdown is required" });
+  }
 
   createPost({ slug, title, markdown });
   return redirect("/posts/admin");
 }
 
 export default function NewPost() {
+  const errors = useActionData();
   return (
     <Form method="post">
       <p>
         <label>
           Post Title:{" "}
           <input type="text" name="title" className={inputClassName} />
+          {errors?.title ? (
+            <em className="text-red-600">{errors.title}</em>
+          ) : null}
         </label>
       </p>
       <p>
         <label>
           Post Slug:{" "}
           <input type="text" name="slug" className={inputClassName} />
+          {errors?.slug ? (
+            <em className="text-red-600">{errors.slug}</em>
+          ) : null}
         </label>
       </p>
       <p>
@@ -47,6 +63,9 @@ export default function NewPost() {
           name="markdown"
           className={`${inputClassName} font-mono`}
         />
+        {errors?.markdown ? (
+          <em className="text-red-600">{errors.markdown}</em>
+        ) : null}
       </p>
       <p className="text-right">
         <button
